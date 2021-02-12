@@ -2,11 +2,13 @@
     <div v-if="filters.length > 0" class="card">
         <scroll-wrap :height="card.filterMaxHeight ? card.filterMaxHeight : 350">
             <div v-if="! card.filterHideTitle" class="py-2 w-full block text-xs uppercase tracking-wide text-center text-80 dim font-bold focus:outline-none">
-                {{this.card.filterMenuTitle ? this.card.filterMenuTitle : 'Filter Menu'}}
+                <button @click="toggleShow()">{{this.card.filterMenuTitle ? this.card.filterMenuTitle : 'Filter Menu'}}</button>
             </div>
-
+            <div>
+            <transition name="list">
             <!-- Custom Filters -->
-            <div v-for="filters in this.filterRows">
+            <div v-show="show">
+                <div v-for="filters in this.filterRows">
                 <div class="float-left nova-big-filter-col">
                     <component
                             v-if="filters[0]"
@@ -71,6 +73,9 @@
                     {{ __('Reset Filters') }}
                 </button>
             </div>
+            </div>
+            </transition>
+            </div>
 
         </scroll-wrap>
     </div>
@@ -80,7 +85,9 @@
     import { Filterable, InteractsWithQueryString } from 'laravel-nova'
     export default {
         mixins: [ Filterable, InteractsWithQueryString ],
+
         props: {
+            show: true,
             card: {
                 filterMenuTitle: String,
                 filterMaxHeight: Number,
@@ -110,6 +117,10 @@
 
             perPageChanged(event) {
                 this.$emit('per-page-changed', event.target.value)
+            },
+            toggleShow(){
+                console.log(this.show)
+                this.show = !this.show
             },
         },
 
@@ -156,3 +167,18 @@
         },
     }
 </script>
+<style scoped>
+    .list-enter,
+    .list-leave-to {
+        visibility: hidden;
+        height: 0;
+        margin: 0;
+        padding: 0;
+        opacity: 0;
+    }
+
+    .list-enter-active,
+    .list-leave-active {
+        transition: all 0.3s;
+    }
+</style>
